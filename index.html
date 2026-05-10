@@ -11,6 +11,44 @@
     <main class="container">
       <section class="card">
         <header class="card__header">
+          <h1>施工写真から投稿を一括作成</h1>
+          <p>最大10枚アップロードして、比較・分析・投稿文（カルーセル/リール/note）を自動生成。</p>
+        </header>
+
+        <form id="postForm" class="form">
+          <label>施工内容<input type="text" id="workContent" required /></label>
+          <label>こだわりポイント<textarea id="specialPoint" required></textarea></label>
+          <label>エリア<input type="text" id="area" required /></label>
+          <label>写真の補足説明<textarea id="photoDesc" required></textarea></label>
+
+          <label class="file-input">
+            写真アップロード（最大10枚）
+            <input type="file" id="photoFiles" accept="image/*" multiple />
+          </label>
+
+          <div class="pairing">
+            <label>施工前の写真番号
+              <select id="beforeIndex"><option value="">未選択</option></select>
+            </label>
+            <label>施工後の写真番号
+              <select id="afterIndex"><option value="">未選択</option></select>
+            </label>
+          </div>
+
+          <div id="gallery" class="gallery"></div>
+          <button type="submit">投稿をまとめて作成</button>
+        </form>
+      </section>
+
+      <section class="card output" aria-live="polite">
+        <h2>生成結果</h2>
+        <div class="output__item"><h3>共通テイスト分析</h3><p id="styleResult"></p></div>
+        <div class="output__item"><h3>キャッチコピー</h3><p id="copyResult"></p></div>
+        <div class="output__item"><h3>写真ごとの説明</h3><p id="photoSummaryResult"></p></div>
+        <div class="output__item"><h3>施工前後比較</h3><p id="comparisonResult"></p></div>
+        <div class="output__item"><h3>Instagramカルーセル投稿文</h3><p id="carouselResult"></p></div>
+        <div class="output__item"><h3>リール用短文</h3><p id="reelResult"></p></div>
+        <div class="output__item"><h3>note記事用の長文</h3><p id="noteResult"></p></div>
           <h1>リフォーム会社向け<br />Instagram投稿作成</h1>
           <p>入力 + 写真アップロードで、施工事例に合った投稿文とハッシュタグを自動作成します。</p>
           <p>必要事項を入力するだけで、投稿文・タイトル・ハッシュタグを自動作成します。</p>
