@@ -1,4 +1,5 @@
 :root {
+  --bg: #f5f6fb;
   --bg: #f7f7f9;
   --card: #ffffff;
   --primary: #4b4de5;
@@ -7,6 +8,7 @@
   --border: #e6e8f0;
 }
 
+* { box-sizing: border-box; }
 * {
   box-sizing: border-box;
 }
@@ -19,6 +21,12 @@ body {
 }
 
 .container {
+  max-width: 1020px;
+  margin: 20px auto;
+  padding: 0 14px calc(24px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   max-width: 1000px;
   margin: 36px auto;
   padding: 0 16px;
@@ -29,6 +37,27 @@ body {
 
 .card {
   background: var(--card);
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 20px rgba(60, 66, 87, 0.08);
+}
+
+.card__header h1 { margin: 0; font-size: clamp(1.2rem, 3.8vw, 1.6rem); line-height: 1.35; }
+.card__header p { color: var(--muted); margin: 8px 0 16px; line-height: 1.6; font-size: 0.95rem; }
+
+.form { display: grid; gap: 12px; }
+label { display: grid; gap: 8px; font-size: 0.92rem; font-weight: 600; }
+input, textarea, button { font: inherit; }
+
+input, textarea {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+input:focus, textarea:focus {
   border-radius: 18px;
   padding: 24px;
   border: 1px solid var(--border);
@@ -81,6 +110,50 @@ textarea:focus {
   box-shadow: 0 0 0 4px rgba(75, 77, 229, 0.15);
 }
 
+textarea { min-height: 90px; resize: vertical; }
+
+.preview {
+  border: 1px dashed #cfd4ea;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fafbff;
+}
+
+.preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.preview p { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+button {
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  padding: 13px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  position: sticky;
+  bottom: 6px;
+}
+
+.output__item {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8f9ff;
+  border: 1px solid #eaecff;
+  margin-bottom: 10px;
+}
+
+.output__item h3 { margin: 0 0 8px; font-size: 0.92rem; }
+.output__item p { margin: 0; white-space: pre-wrap; line-height: 1.65; font-size: 0.93rem; }
+
+@media (max-width: 640px) {
+  .container { margin-top: 10px; gap: 10px; }
+  .card { padding: 14px; border-radius: 14px; }
 textarea {
   min-height: 96px;
   resize: vertical;
