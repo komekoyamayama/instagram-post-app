@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Instagram投稿作成アプリ</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -48,6 +49,65 @@
         <div class="output__item"><h3>Instagramカルーセル投稿文</h3><p id="carouselResult"></p></div>
         <div class="output__item"><h3>リール用短文</h3><p id="reelResult"></p></div>
         <div class="output__item"><h3>note記事用の長文</h3><p id="noteResult"></p></div>
+          <h1>リフォーム会社向け<br />Instagram投稿作成</h1>
+          <p>入力 + 写真アップロードで、施工事例に合った投稿文とハッシュタグを自動作成します。</p>
+          <p>必要事項を入力するだけで、投稿文・タイトル・ハッシュタグを自動作成します。</p>
+        </header>
+
+        <form id="postForm" class="form">
+          <label>
+            施工内容
+            <input type="text" id="workContent" placeholder="例：キッチンのフルリフォーム" required />
+          </label>
+
+          <label>
+            こだわりポイント
+            <textarea id="specialPoint" placeholder="例：収納力アップと家事動線の改善" required></textarea>
+          </label>
+
+          <label>
+            エリア
+            <input type="text" id="area" placeholder="例：東京都世田谷区" required />
+          </label>
+
+          <label>
+            写真の説明
+            <textarea id="photoDesc" placeholder="例：明るい木目のキッチンと広々カウンター" required></textarea>
+          </label>
+
+          <label>
+            写真アップロード
+            <input type="file" id="photoFile" accept="image/*" />
+          </label>
+
+          <div class="preview" id="previewArea" hidden>
+            <img id="photoPreview" alt="アップロード写真のプレビュー" />
+            <p id="photoMeta"></p>
+          </div>
+
+          <button type="submit">投稿内容を作成する</button>
+        </form>
+      </section>
+
+      <section class="card output" id="output" aria-live="polite">
+        <h2>作成結果</h2>
+        <div class="output__item">
+          <h3>写真解析</h3>
+          <p id="analysisResult">写真をアップロードすると解析結果が表示されます。</p>
+        </div>
+        <div class="output__item">
+          <h3>タイトル</h3>
+          <p id="titleResult">ここにタイトルが表示されます。</p>
+        </div>
+        <div class="output__item">
+          <h3>Instagram投稿文</h3>
+          <p id="captionResult">ここに投稿文が表示されます。</p>
+        </div>
+        <div class="output__item">
+          <h3>ハッシュタグ（最適化）</h3>
+          <h3>ハッシュタグ（5個）</h3>
+          <p id="hashtagResult">ここにハッシュタグが表示されます。</p>
+        </div>
       </section>
     </main>
 
