@@ -48,18 +48,12 @@ const analyzeImage = (file) =>
         const px = data.length / 4;
         const brightness = Math.round(bright / px);
         const warmth = Math.round(warm / px);
-        const orientation = img.width >= img.height ? "横" : "縦";
-        const mood = brightness > 165 ? "明るく開放感のある印象" : brightness > 125 ? "落ち着きとやわらかさのある印象" : "上質で落ち着いた印象";
 
         resolve({
           file,
           src: reader.result,
-          width: img.width,
-          height: img.height,
           brightness,
           warmth,
-          orientation,
-          mood,
         });
       };
 
@@ -71,51 +65,49 @@ const analyzeImage = (file) =>
 
 const detectStyle = (items) => {
   if (!items.length) {
-    return { name: "未判定", points: "写真をアップロードすると分析できます。" };
+    return {
+      name: "ナチュラル",
+      mood: "やわらかく暮らしに馴染む雰囲気",
+    };
   }
 
   const avgB = Math.round(items.reduce((s, a) => s + a.brightness, 0) / items.length);
   const avgW = Math.round(items.reduce((s, a) => s + a.warmth, 0) / items.length);
 
   if (avgB > 170 && avgW > 8) {
-    return { name: "ナチュラル", points: "明るさと木質系のあたたかさがあり、やさしい暮らしの雰囲気が伝わります。" };
+    return {
+      name: "ナチュラル",
+      mood: "木のやわらかさを感じる、暮らし寄りの空気感",
+    };
   }
 
   if (avgB < 135) {
-    return { name: "ホテルライク", points: "陰影があり、落ち着きと上質感を見せやすい写真です。" };
+    return {
+      name: "ホテルライク",
+      mood: "陰影を活かした上質で落ち着いた雰囲気",
+    };
   }
 
-  return { name: "カフェ風", points: "ほどよい明るさと居心地のよさがあり、暮らし寄りの投稿に向いています。" };
+  return {
+    name: "カフェ風",
+    mood: "居心地の良さを感じるカフェのような空気感",
+  };
 };
 
-const photoComment = (a, i) =>
-  `写真${i + 1}：${a.orientation}構図・${a.width}×${a.height}px。${a.mood}。`;
-
-const setPairOptions = (count) => {
-  const options = ['<option value="">未選択</option>'];
-  for (let i = 0; i < count; i += 1) {
-    options.push(`<option value="${i}">写真${i + 1}</option>`);
-  }
-  beforeIndexSelect.innerHTML = options.join("");
-  afterIndexSelect.innerHTML = options.join("");
-};
-
-const buildHashtags = ({ area, workContent, specialPoint, photoDesc, styleName }) => {
-  const candidates = [
+const buildHashtags = ({ area, workContent, styleName }) => {
+  const tags = [
     "リフォーム",
     "施工事例",
     normalizeForTag(area),
     normalizeForTag(workContent),
     normalizeForTag(styleName),
-    normalizeForTag(specialPoint.split("と")[0] || specialPoint),
-    normalizeForTag(photoDesc.split("と")[0] || photoDesc),
-    "住まいづくり",
+    "暮らしを整える",
     "横浜リフォーム",
-  ].filter(Boolean);
+    "ワイズプランニング",
+  ];
 
-  return [...new Set(candidates)]
-    .filter((tag) => tag.length > 1)
-    .slice(0, 8)
+  return [...new Set(tags)]
+    .filter(Boolean)
     .map((tag) => `#${tag}`)
     .join(" ");
 };
@@ -129,14 +121,21 @@ photoFilesInput.addEventListener("change", async (event) => {
   gallery.innerHTML = analyses
     .map(
       (a, i) => `
-        <article class="thumb">
-          <img src="${a.src}" alt="写真${i + 1}" />
-          <p>写真${i + 1}</p>
-        </article>`
+      <article class="thumb">
+        <img src="${a.src}" alt="写真${i + 1}" />
+        <p>写真${i + 1}</p>
+      </article>`
     )
     .join("");
 
-  setPairOptions(analyses.length);
+  const options = ['<option value="">未選択</option>'];
+
+  for (let i = 0; i < analyses.length; i += 1) {
+    options.push(`<option value="${i}">写真${i + 1}</option>`);
+  }
+
+  beforeIndexSelect.innerHTML = options.join("");
+  afterIndexSelect.innerHTML = options.join("");
 });
 
 form.addEventListener("submit", (event) => {
@@ -148,33 +147,67 @@ form.addEventListener("submit", (event) => {
   const photoDesc = document.getElementById("photoDesc").value.trim();
 
   const style = detectStyle(analyses);
-  const photoCountText = analyses.length ? `${analyses.length}枚の写真` : "入力内容";
 
-  styleResult.textContent = `${style.name}テイスト｜${style.points}`;
-  copyResult.textContent = `「${area}で叶える、${style.name}な${workContent}」`;
-  photoSummaryResult.textContent = analyses.length
-    ? analyses.map((a, i) => photoComment(a, i)).join("\n")
-    : "写真未アップロードのため、入力内容をもとに作成しています。";
+  styleResult.textContent = `${style.name}｜${style.mood}`;
 
-  const beforeValue = beforeIndexSelect.value;
-  const afterValue = afterIndexSelect.value;
+  copyResult.textContent = `「なんとなく使いづらい」を、毎日ちょっと気分が上がる${workContent}へ。`;
 
-  if (beforeValue !== "" && afterValue !== "" && beforeValue !== afterValue) {
-    const before = analyses[Number(beforeValue)];
-    const after = analyses[Number(afterValue)];
-    const diff = after.brightness - before.brightness;
-    comparisonResult.textContent = `施工前（写真${Number(beforeValue) + 1}）から施工後（写真${Number(afterValue) + 1}）へ、${diff >= 0 ? "より明るく開放的" : "落ち着きのある上質"}な印象に変化しています。`;
-  } else {
-    comparisonResult.textContent = analyses.length >= 2
-      ? "施工前後比較をしたい場合は、施工前・施工後の写真番号を選んでください。"
-      : "比較するには写真を2枚以上アップロードしてください。";
-  }
+  photoSummaryResult.textContent = `写真全体から、${style.mood}が伝わる印象です。\n生活感を残しつつ、整った雰囲気に見せやすい施工写真です。`;
 
-  carouselResult.textContent = `【${area}｜${workContent}事例】\n\n${photoCountText}から、${style.name}な雰囲気が伝わる施工事例です。\n\n今回のポイントは、${specialPoint}。\n${photoDesc}を意識しながら、見た目だけでなく毎日の使いやすさも大切にしました。\n\n小さな違和感や使いにくさも、リフォームでぐっと快適になります。`;
+  comparisonResult.textContent = `施工前後で、空間の印象だけでなく「暮らしやすさ」が伝わる変化になっています。`;
 
-  reelResult.textContent = `${area}の${workContent}事例。\n${specialPoint}を大切に、${style.name}な空間へ。\n暮らしやすさと見た目、どちらも整えるリフォームです。`;
+  carouselResult.textContent = `【${area}｜${workContent}施工事例】
 
-  noteResult.textContent = `${area}で行った${workContent}の施工事例をご紹介します。\n\n今回大切にしたのは「${specialPoint}」。写真からは、${style.points}\n\n${photoDesc}という印象を活かしながら、日々の暮らしの中で使いやすさを感じられるように整えました。\n\nリフォームは、見た目を変えるだけではなく、毎日の小さなストレスを減らすことにもつながります。ワイズプランニングでは、暮らし方に合わせて、やった方がいいこと・無理にやらなくてもいいことを整理しながらご提案しています。`;
+「なんとなく使いづらい」を、
+毎日ちょっと気分が上がる空間へ。
 
-  hashtagResult.textContent = buildHashtags({ area, workContent, specialPoint, photoDesc, styleName: style.name });
+今回は、${specialPoint}を意識しながら、
+見た目だけではなく使いやすさも整えました。
+
+写真からも、${style.mood}が伝わる仕上がりに◎
+
+${photoDesc}
+
+リフォームって、
+ただ新しくするだけじゃなく、
+毎日の小さなストレスを減らすことだと思っています。
+
+ワイズプランニングでは、
+「やった方がいいこと」と
+「無理にやらなくてもいいこと」も含めて、
+暮らしに合わせてご提案しています。`;
+
+  reelResult.textContent = `${workContent}施工事例。
+
+${specialPoint}を大切に、
+${style.name}な空間へ。
+
+見た目だけじゃなく、
+毎日の使いやすさも整えました◎`;
+
+  noteResult.textContent = `${area}で行った${workContent}の施工事例をご紹介します。
+
+今回ご相談いただいたのは、
+「なんとなく使いづらい」というお悩み。
+
+毎日使う場所だからこそ、
+小さなストレスって意外と積み重なるんですよね。
+
+今回は、${specialPoint}を意識しながら、
+見た目と使いやすさのバランスを整えました。
+
+写真からも、${style.mood}が感じられる仕上がりになっています。
+
+${photoDesc}
+
+ワイズプランニングでは、
+職人目線だけでなく、実際の暮らし方も大切にしながらご提案しています。
+
+「これ頼んでいいのかな？」くらいの小さな相談も大歓迎です◎`;
+
+  hashtagResult.textContent = buildHashtags({
+    area,
+    workContent,
+    styleName: style.name,
+  });
 });
